@@ -2,6 +2,7 @@
 import math
 from random import *
 x = randint(10000000, 1000000000)
+x= 23232
 print(x)
 count = 0
 i = 2
