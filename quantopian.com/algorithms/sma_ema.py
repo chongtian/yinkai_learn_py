@@ -29,9 +29,14 @@ def make_pipeline(context):
     assets = context.assets
 
     # Define factors.
-    ma_fast = SimpleMovingAverage(inputs=[EquityPricing.close], window_length=fast_ma_periods)
-    # ma_slow = SimpleMovingAverage(inputs=[EquityPricing.close], window_length=slow_ma_periods)
-    ma_slow = EWMA.from_span(inputs=[EquityPricing.close], window_length=slow_ma_periods*2+20, span=slow_ma_periods,)
+    if context.fast_ma_type == 'sma':
+        ma_fast = SimpleMovingAverage(inputs=[EquityPricing.close], window_length=fast_ma_periods)
+    else:
+        ma_fast = EWMA.from_span(inputs=[EquityPricing.close], window_length=fast_ma_periods*2+20, span=fast_ma_periods,)
+    if context.slow_ma_type == 'sma':
+        ma_slow = SimpleMovingAverage(inputs=[EquityPricing.close], window_length=slow_ma_periods)
+    else:
+        ma_slow = EWMA.from_span(inputs=[EquityPricing.close], window_length=slow_ma_periods*2+20, span=slow_ma_periods,)
     last_close_price = EquityPricing.close.latest
 
     # Define a filter.
@@ -53,6 +58,9 @@ def initialize(context):
     # Parameters of the algorithm
     context.fast_ma_periods = 10
     context.slow_ma_periods = 20
+    # sma or ema
+    context.slow_ma_type='sma'
+    context.fast_ma_type='sma'
     context.assets = [symbol('VGT')]
     context.out_of_market = symbol('BND')
     context.threshold_sell_loss = -0.05
@@ -60,6 +68,7 @@ def initialize(context):
     context.threshold_signal_count = 2
     context.threshold_stop_loss = -0.1
     context.threshold_hold_days = 1
+    # Buy immediately after sell
     context.aggressive_buy = True
     context.move_fund_out_of_market = True
     
@@ -164,15 +173,3 @@ def rebalance(context, data):
         
     context.hold_days += 1
     
-def record_vars(context, data):
-    """
-    Plot variables at the end of each day.
-    """
-    pass
-
-
-def handle_data(context, data):
-    """
-    Called every minute.
-    """
-    pass
