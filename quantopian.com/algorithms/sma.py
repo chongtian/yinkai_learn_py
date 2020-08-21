@@ -2,7 +2,6 @@
 This algorithm checks buy/sell signals through moving average.
 Raw buy signal = current price is larger than both SMA(10) and EMA(20)
 Raw sell signal = current price is smaller than both SMA(10) and EMA(20)
-Note: Current price is the real-time minute-level price, while SMA and EMA are from the day before today
 When there are two consecutive buy signals which are not interrupted by sell signal, I will buy.
 When there are two consecutive sell signals which are not interrupted by buy signal, I will sell.
 After I sell, if there is an immediate following sell signal, I will also buy.
@@ -17,7 +16,7 @@ from quantopian.algorithm import attach_pipeline, pipeline_output
 
 # imports for pipeline
 from quantopian.pipeline import Pipeline
-from quantopian.pipeline.factors import SimpleMovingAverage, EWMA
+from quantopian.pipeline.factors import SimpleMovingAverage
 from quantopian.pipeline.data import EquityPricing
 from quantopian.pipeline.filters import StaticAssets
 
@@ -30,8 +29,7 @@ def make_pipeline(context):
 
     # Define factors.
     ma_fast = SimpleMovingAverage(inputs=[EquityPricing.close], window_length=fast_ma_periods)
-    # ma_slow = SimpleMovingAverage(inputs=[EquityPricing.close], window_length=slow_ma_periods)
-    ma_slow = EWMA.from_span(inputs=[EquityPricing.close], window_length=slow_ma_periods*2+20, span=slow_ma_periods,)
+    ma_slow = SimpleMovingAverage(inputs=[EquityPricing.close], window_length=slow_ma_periods)
     last_close_price = EquityPricing.close.latest
 
     # Define a filter.
@@ -110,24 +108,13 @@ def rebalance(context, data):
     
     # get moving average from pipeline and set buy and sell signals
     cur = pipeline_output('etf_pipeline').iloc[0]
-    # the signals are from yesterday
     price_compare = cur_price
-    # price_compare = cur.price
     if (price_compare > cur.fast_ma and price_compare > cur.slow_ma):
         context.buy_signal_count += 1
         context.sell_signal_count = 0
     if (price_compare < cur.slow_ma and price_compare < cur.fast_ma):
         context.buy_signal_count = 0
         context.sell_signal_count += 1
-    
-    # Store data for record
-    record(
-        #price_today=cur_price,
-        #price_yesterday=cur.price,
-        return_today=return_percent,
-        #slow_ma=cur.slow_ma,
-        #fast_ma=cur.fast_ma
-           )
     
     buy = False
     sell = False
@@ -163,16 +150,3 @@ def rebalance(context, data):
         context.hold_days = 0
         
     context.hold_days += 1
-    
-def record_vars(context, data):
-    """
-    Plot variables at the end of each day.
-    """
-    pass
-
-
-def handle_data(context, data):
-    """
-    Called every minute.
-    """
-    pass

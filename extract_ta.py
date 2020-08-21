@@ -5,7 +5,7 @@ import json
 from datetime import date
 
 # the file path to save TA data
-save_path = 'd:\\temp'
+save_path = '.'
 
 # Complete List of columns
 # {"symbols": {
@@ -35,7 +35,6 @@ save_path = 'd:\\temp'
 def extract_data(full_ticker):
     url = 'https://scanner.tradingview.com/america/scan'
     headers = {'Content-Type': 'application/json'}
-    data = []
     # Get JSON from tradingview.com web api
     payload = {
         "symbols": {"tickers": [full_ticker],
@@ -53,7 +52,7 @@ def extract_data(full_ticker):
 
 
 tickers = ['NASDAQ:IBUY', 'NASDAQ:ADMA', 'AMEX:ARKF', 'AMEX:ARKG', 'AMEX:ARKW', 'NASDAQ:CHNG',
-           'NASDAQ:ESPO', 'NYSE:IRT', 'NASDAQ:SELB', 'NYSE:STAG', 'AMEX:TAN', 'AMEX:VGT']
+           'NASDAQ:ESPO', 'NYSE:IRT', 'NYSE:STAG', 'AMEX:TAN', 'AMEX:VGT']
 data = {}
 for t in tickers:
     ta = extract_data(t)
