@@ -47,17 +47,18 @@ base_universe = StaticAssets(assets)
 pipe = Pipeline(
     columns={
         'yersterday_price': price,
-        'fast_ma': fast_ma,
-        'slow_ma': slow_ma,
+        'ma_fast': fast_ma,
+        'ma_slow': slow_ma,
         'ema': ema,
-        'sell': sell,
-        'buy': buy
+        'signal_sell': sell,
+        'signal_buy': buy
     },
     screen= base_universe 
 )
 
-end = (date.today()).strftime('%Y-%m-%d')
+end = (date.today() - timedelta(days=0)).strftime('%Y-%m-%d')
 start = (date.today() - timedelta(days=100)).strftime('%Y-%m-%d')
+# print(start,end)
 my_pipeline_result = run_pipeline(pipe, start, end)
 
 # show results of last two days

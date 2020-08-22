@@ -1,8 +1,10 @@
-# This function can parse Vanguard fund holding.
-# For example, visit url https://investor.vanguard.com/mutual-funds/profile/portfolio/VWUSX/portfolio-holdings
-# Use Chrome developer console to capture JS network flow
-# Filter stock.jsonp
-# And save it to a local file
+"""
+This function can parse Vanguard fund holding.
+For example, visit url https://investor.vanguard.com/mutual-funds/profile/portfolio/VWUSX/portfolio-holdings
+Use Chrome developer console to capture JS network flow
+Filter stock.jsonp
+And save it to a local file
+"""
 
 import json
 
