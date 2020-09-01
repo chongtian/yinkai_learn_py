@@ -35,8 +35,8 @@ slow_ma = SimpleMovingAverage(inputs=[EquityPricing.close], window_length=slow_m
 # ema = EWMA.from_span(inputs=[EquityPricing.close], window_length=slow_ma_periods*2+20, span=slow_ma_periods,)
 rsi = RSI(inputs=[EquityPricing.close], window_length=5)
 price = EquityPricing.close.latest
-sell = price < fast_ma and price < slow_ma
-buy = price > fast_ma and price > slow_ma
+sell = (price < fast_ma) & (price < slow_ma)
+buy = (price > fast_ma) & (price > slow_ma)
 
 # Define a filter.
 base_universe = StaticAssets(assets)
@@ -70,8 +70,10 @@ my_pipeline_result = run_pipeline(pipe, start, end)
 
 # display summarized result
 # these dates are used as the first index
-current_date = (date.today() - timedelta(days=0)).strftime('%Y-%m-%d 00:00:00+00:00')
-previous_date = (date.today() - timedelta(days=1)).strftime('%Y-%m-%d 00:00:00+00:00')
+all_dates=my_pipeline_result.index.get_level_values(0)
+unique_dates = sorted(list(dict.fromkeys(all_dates)))
+current_date = unique_dates[-1]
+previous_date = unique_dates[-2]
 for asset in assets:
     current = my_pipeline_result.loc[(current_date,asset)]
     previous = my_pipeline_result.loc[(previous_date,asset)]
@@ -80,4 +82,4 @@ for asset in assets:
         signal = 'Buy'
     if current.signal_sell and previous.signal_sell:
         signal = 'Sell'
-    print('{0} {1} RSI={2:.2f}'.format(str(asset).ljust(22), signal.ljust(8), current.rsi))
+    print('{0} {1} RSI={2:.2f} SMA10={3:.2f} SMA20={4:.2f}'.format(str(asset).ljust(22), signal.ljust(8), current.rsi,current.ma_fast, current.ma_slow))
