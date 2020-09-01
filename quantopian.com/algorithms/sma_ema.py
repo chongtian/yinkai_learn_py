@@ -98,7 +98,7 @@ def initialize(context):
     pipe = make_pipeline(context)
     attach_pipeline(pipe, name='etf_pipeline')
     
-    set_slippage(slippage.FixedSlippage(spread = 0.0)) 
+    set_slippage(slippage.NoSlippage()) 
 
     # Rebalance every day, 30 minutes before the market close.
     algo.schedule_function(
